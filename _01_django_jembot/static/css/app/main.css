@@ -1,0 +1,530 @@
+server
+:root {
+    --input-background-color: rgb(237, 237, 237);
+    --chat-bot__content-color: rgb(240, 240, 240);
+    --chat-user__content-color: rgb(0, 122, 255);
+    --chat__time-color: rgb(137, 137, 137);
+    /* --action-btn-color: rgb(0, 69, 143); */
+    --action-btn-color: rgb(195, 210, 237);
+    --action-btn-font-color: rgb(0, 69, 143);
+    --level-button-color: rgb(195, 210, 237);
+}
+
+[class*="__mark"] {
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.chat-container {
+    display: flex;
+    height: calc(100vh - 140px); 
+}
+
+/* ㅡㅡㅡㅡ 대화목록 css ㅡㅡㅡㅡ */
+
+.chat-list {
+    width: 250px;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    padding :0px 20px;
+    height: 100%;
+    display:flex;
+    flex-direction: column;
+}
+
+.chat-list__add {
+    display : flex;
+    justify-content: space-between;
+    padding-top : 20px;
+}
+
+.chat-list__name {
+    font-weight: 600;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-add-button button {
+    width: 30px;  
+    height: 30px;
+    font-size: 14px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-list__box {
+    margin: 10px 0px;
+    border-radius: 10px;
+    font-size: 15px;
+    display : flex;
+    align-items: center;
+    justify-content: space-between; 
+}
+
+.chat-list__text {
+    cursor: pointer;
+    padding : 10px;
+    flex: 1;
+}
+
+.chat-list__box:hover {
+    background-color: var(--action-btn-color);
+}
+
+.chat-list__time {
+    font-size: 12px;
+}
+
+.dropdown {
+    margin-left: auto;
+}
+
+.dropdown .btn {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    display :flex;
+    justify-content: center;
+    align-items: center;
+    width : 20px;
+    height : 20px;
+    color : var(--action-btn-font-color);
+    padding-right : 15px;
+}
+
+.dropdown .btn:hover,
+.dropdown .btn:focus,
+.dropdown .btn:active {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.btn-group {
+    width : 200px;
+    height : 36px;
+}
+
+.btn-group .btn {
+    /* background-color: var(--level-button-color); */
+    border-color: var(--level-button-color);
+    border-radius: 20px;
+    color: var(--action-btn-font-color);
+    font-size: 14px;
+}
+
+.btn-group .btn:hover {
+    background-color: var(--level-button-color);
+    border-color: var(--level-button-color);
+    color: var(--action-btn-font-color);
+}
+
+.btn-group .btn-check:checked + .btn {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+    color: white !important;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+/* ㅡㅡㅡㅡ 챗봇 css ㅡㅡㅡㅡ */
+
+.chat-window {
+    flex: 1;
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+    padding:0px 20px ;
+}
+
+.chat-start__container{
+    display: flex;
+    justify-content: center;
+    padding : 40px 0px 20px 0px;
+}
+
+.chat-start__inside {
+    color : var(--chat__time-color);
+    font-size : 12px;
+    text-align: center;
+}
+
+.chat-messages,
+.choices-info,
+.chat-list__item {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin; 
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent; 
+    padding-bottom : 20px;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-bot {
+    display : flex;
+    gap : 10px;
+    padding-top : 40px;
+    position: relative;
+}
+
+.chat-bot__content {
+    padding : 10px 20px;
+    border-radius: 20px;
+    background-color: var(--chat-bot__content-color);
+    width: fit-content; 
+    max-width: 80%; 
+    word-wrap: break-word; 
+    white-space: pre-line;
+}
+
+.chat-bot__time, .chat-user__time {
+    font-size: 12px;
+    color : var(--chat__time-color);
+    display : flex;
+    align-items: end;
+}
+
+.chat-user {
+    display: flex;
+    justify-content: flex-end; 
+    gap : 10px;
+    padding-top : 20px;
+}
+
+.chat-user__content {
+    padding : 10px 20px;
+    border-radius: 20px;
+    background-color: var(--chat-user__content-color);
+    width: fit-content; 
+    max-width: 80%; 
+    word-wrap: break-word; 
+    color : white;
+    font-weight: 500;
+}
+
+
+.beginner_answer__mark {
+    position: absolute;
+    top: 10px;
+    left: 20px; 
+    background-color: #4b9df5;
+}
+
+.intermediate_answer__mark {
+    position: absolute;
+    top: 10px;
+    left: 20px; 
+    background-color: #ff9500;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.advanced_answer__mark {
+    background-color: #e74c3c;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* 로딩 애니메이션 */
+.loading-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #999;
+    animation: loading-dots 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes loading-dots {
+    0%, 80%, 100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.loading-message .chat-bot__content {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-input__container,
+.choices-input__container,
+.btn-group__container {
+    padding: 20px 0px;
+    border-top: 1px solid #ddd;
+}
+
+.chat-input ,
+.choices-input { 
+    flex : 1;
+    width : 100%;
+    border-radius: 20px;
+    padding-left : 20px;
+    padding-right : 20px;
+    background-color: var(--input-background-color);
+    display : flex;
+    gap : 20px;
+}
+
+.chat-input__box,
+.choices-input__box {
+    flex : 1;
+}
+
+.chat-input__box input,
+.choices-input__box input {
+    width : 100%;
+    padding: 5px;
+    border: none;
+    background-color: var(--input-background-color);
+    outline: none;
+}
+
+.chat-search-button button,
+.choices-search-button button {
+    border : none;
+}
+
+.chat-search-button button:hover {
+    background-color: var(--input-background-color);
+    color : darkgray !important;
+}
+
+/* ㅡㅡㅡㅡ 뉴스 주식 버튼 css ㅡㅡㅡㅡ */
+
+.additional_info {
+    border-left: 1px solid #ddd;
+    width : 300px;
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+    padding:0px 20px ;
+}
+
+.choices { 
+    padding: 20px 0px;
+    display :flex;
+    justify-content: space-between;
+}
+
+.news-button button, .stock-button button{
+    border-radius: 25px ;
+    width : 120px;
+}
+
+.chat-add-button .btn,
+.news-button .btn,
+.stock-button .btn {
+    border-color: var(--action-btn-color);
+    color: var(--action-btn-font-color);
+}
+
+.chat-add-button .btn:hover,
+.news-button .btn:hover,
+.stock-button .btn:hover {
+    background-color: var(--action-btn-color);
+    border-color: var(--action-btn-color);
+    color: var(--action-btn-font-color);
+}
+
+.chat-add-button .btn.active,
+.news-button .btn.active,
+.stock-button .btn.active {
+    background-color: var(--action-btn-color) !important;
+    border-color: var(--action-btn-color) !important;
+    color: var(--action-btn-font-color) !important;
+}
+
+/* ㅡㅡㅡㅡ 뉴스 css ㅡㅡㅡㅡ */
+
+/* .news-container {
+    display : none;
+} */
+
+.news-box {
+    padding : 10px 0px;
+}
+
+.news-box:hover {
+    background-color: rgb(246, 246, 246);
+    border-radius: 20px;
+    padding:10px;
+}
+
+.news-box__top { 
+    display : flex;
+    gap : 10px;
+    padding-bottom : 10px;
+   
+}
+
+.news-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* 2줄까지 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.news-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* 2줄까지 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color : var(--chat__time-color);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.news-label__mark{
+    background-color: rgb(220, 235, 220);
+    color : rgb(76, 110, 76);
+}
+
+.news-label__time {
+    display:flex;
+    align-items: center;
+    font-size: 12px;
+    color : var(--chat__time-color)
+}
+
+.action-radio:checked + .btn {
+    background-color: var(--action-btn-color);
+    border-color: var(--action-btn-color);
+    color: var(--action-btn-font-color);
+}
+
+
+/* ㅡㅡㅡㅡ 주식 css ㅡㅡㅡㅡ */
+
+.stock-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 32px;
+    display:none;
+}
+  
+.stock-box {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 100px;
+}
+  
+.stock-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+  
+.stock-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #222;
+}
+  
+.stock-code {
+    font-size: 1rem;
+    color: #b0b8c1;
+    font-weight: 500;
+}
+  
+.stock-price-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+  
+.current-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #222;
+}
+  
+.price-change {
+    font-size: 1rem;
+    font-weight: 500;
+}
+  
+.price-change.positive { color: #1dbf60; }
+.price-change.negative { color: #e74c3c; }
+  
+.update-time {
+    font-size: 0.9rem;
+    color: #b0b8c1;
+}
+  
+.stock-chart {
+    margin: 12px 0 18px 0;
+    background: #f3f6fa;
+    border-radius: 12px;
+    padding: 12px 8px;
+}
+  
+.stock-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+  
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+  
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    min-width: 110px;
+    gap: 2px;
+}
+  
+.label {
+    font-size: 0.95rem;
+    color: #b0b8c1;
+    font-weight: 500;
+}
+  
+.value {
+    font-size: 1.08rem;
+    color: #222;
+    font-weight: 600;
+}

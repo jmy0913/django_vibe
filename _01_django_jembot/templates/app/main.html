@@ -1,0 +1,252 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "css/app/main.css" %}">
+    <script src="{% static "js/app/chat.js" %}" defer></script>
+{% endblock head %}
+
+{% block title %}chatbot{% endblock title %}
+
+{% block content %}
+    <div class = "chat-container">
+        <div class = "chat-list">
+            <div class = "chat-list__add">
+                <div class = "chat-list__name">대화 목록</div>
+                <div class = "chat-add-button"><button type="button" class="btn btn-outline-secondary">+</button></div>
+            </div>
+            <div class = "chat-list__item">
+                <div class = "chat-list__empty">저장된 대화가 없습니다.</div>
+            </div>
+            
+
+            <div class = 'btn-group__container'>
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="btnradio1">초급</label>
+                  
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio2">중급</label>
+                  
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio3">고급</label>
+                </div>
+            </div>
+        </div>
+        <div class = "chat-window">
+            <div class="chat-messages">
+                <div class="chat-start__container">
+                    <div class = "chat-start__inside">
+                        <div class = "brand-name">JemBot Message</div>
+                        <div class = "chat-start__time">Today 14:36</div>
+                    </div>
+                </div>
+                <div class="chat-bot">
+                    <div class = "chat-bot__content">안녕하세요 무엇을 도와드릴까요?</div>
+                    <div class = "chat-bot__time">14:36</div>
+                </div>
+            </div>
+            <div class="chat-input__container">
+                <div class = "chat-input">
+                    <div class = "chat-input__box">
+                        <input type="text" placeholder="재무 데이터 rag에게 물어보기..." />
+                    </div>
+                    <div class="chat-search">
+                        <div class="chat-search-button">
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class = "additional_info">
+            <div class = "choices">
+                <div class = "news">
+                    <div class = "news-button"><button id = "news-button" type="button" class="btn btn-outline-secondary">뉴스</button></div>
+                </div>
+                <div class = "stock">
+                    <div class = "stock-button"><button id = "stock-button" type="button" class="btn btn-outline-secondary">주식</button></div>
+                </div>
+    
+            </div>
+            <div class="choices-info">
+                <div class = "news-container" id = "news-container">
+                    <div class = "news-box">
+                        <div class = "news-box__top">
+                            <div class = "news-label__mark">
+                                경제
+                            </div>
+                            <div class = "news-label__time">
+                                4분전
+                            </div>
+                        </div>
+                        <div class = "news-title">
+                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
+                        </div>
+                        <div class = "news-content">
+                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
+                        </div>
+                    </div>
+                    <div class = "news-box">
+                        <div class = "news-box__top">
+                            <div class = "news-label__mark">
+                                경제
+                            </div>
+                            <div class = "news-label__time">
+                                4분전
+                            </div>
+                        </div>
+                        <div class = "news-title">
+                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
+                        </div>
+                        <div class = "news-content">
+                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
+                        </div>
+                    </div>
+                    <div class = "news-box">
+                        <div class = "news-box__top">
+                            <div class = "news-label__mark">
+                                경제
+                            </div>
+                            <div class = "news-label__time">
+                                4분전
+                            </div>
+                        </div>
+                        <div class = "news-title">
+                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
+                        </div>
+                        <div class = "news-content">
+                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
+                        </div>
+                    </div>
+                    <div class = "news-box">
+                        <div class = "news-box__top">
+                            <div class = "news-label__mark">
+                                경제
+                            </div>
+                            <div class = "news-label__time">
+                                4분전
+                            </div>
+                        </div>
+                        <div class = "news-title">
+                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
+                        </div>
+                        <div class = "news-content">
+                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
+                        </div>
+                    </div>
+                    <div class = "news-box">
+                        <div class = "news-box__top">
+                            <div class = "news-label__mark">
+                                경제
+                            </div>
+                            <div class = "news-label__time">
+                                4분전
+                            </div>
+                        </div>
+                        <div class = "news-title">
+                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
+                        </div>
+                        <div class = "news-content">
+                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
+                        </div>
+                    </div>
+                    <div class = "news-box">
+                        <div class = "news-box__top">
+                            <div class = "news-label__mark">
+                                경제
+                            </div>
+                            <div class = "news-label__time">
+                                4분전
+                            </div>
+                        </div>
+                        <div class = "news-title">
+                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
+                        </div>
+                        <div class = "news-content">
+                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
+                        </div>
+                    </div>
+                </div>
+                <div class="stock-container" id = "stock-container">
+                    <div class="stock-box">
+                        <div class="stock-header">
+                            <div class="stock-name">NAVER</div>
+                            <div class="stock-code">035420.KS</div>
+                        </div>
+                        <div class="stock-price-section">
+                            <div class="current-price">₩ 200,000</div>
+                            <div class="price-change positive">+2,500 (+1.25%)</div>
+                            <div class="update-time">14:30 KST</div>
+                        </div>
+                        <div class="stock-chart">
+                            <canvas id="stockChart" width="300" height="100"></canvas>
+                        </div>
+                        <div class="stock-details">
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <span class="label">시가총액</span>
+                                    <span class="value">₩ 32조 5,000억</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">거래량</span>
+                                    <span class="value">1,234,567주</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <span class="label">52주 최고</span>
+                                <span class="value">₩ 220,000</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">52주 최저</span>
+                                <span class="value">₩ 150,000</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <span class="label">PER</span>
+                                <span class="value">25.3</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">PBR</span>
+                                <span class="value">3.2</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <span class="label">당일 최고가</span>
+                                <span class="value">25,500원</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">당일 최저가</span>
+                                <span class="value">249,000원</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="choices-input__container">
+                <div class = "choices-input">
+                    <div class = "choices-input__box">
+                        <input type="text" placeholder="뉴스 검색" />
+                    </div>
+                    <div class="choices-search">
+                        <div class="choices-search-button">
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+{% endblock content %}
+

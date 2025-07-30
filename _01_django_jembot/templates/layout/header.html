@@ -1,0 +1,17 @@
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/layout/header.css' %}">
+{% endblock head %}
+
+<div class="header">
+    <div class="header__logo">
+        <img src="{% static 'images/robot-icon.png' %}" alt="Robot Icon" class="header__logo-image" />
+        <div class="header__logo-name">JemBot</div>
+		{#span id="nickname" 새로 생성#}
+	    <span id="nickname"> | (유저: {{ nickname.nickname }})</span>
+    </div>
+    <div class="header__actions">
+        <div class="header__help">?</div>
+        <div class="header__login">Login</div>
+    </div>
+</div>
