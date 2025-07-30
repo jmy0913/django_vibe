@@ -3,6 +3,7 @@
 
 {% block head %}
     {{ block.super }}
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="stylesheet" href="{% static "css/app/main.css" %}">
     <script src="{% static "js/app/chat.js" %}" defer></script>
 {% endblock head %}
@@ -12,12 +13,35 @@
 {% block content %}
     <div class = "chat-container">
         <div class = "chat-list">
+            <!-- 사용자 정보 섹션 -->
+            <div class="user-info-section">
+                <div class="user-profile">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture }}" alt="프로필" class="user-avatar">
+                    {% else %}
+                        <div class="user-avatar-placeholder">{{ user.first_name|first|upper }}</div>
+                    {% endif %}
+                    <div class="user-details">
+                        <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                        <div class="user-email">{{ user.email }}</div>
+                    </div>
+                    <div class="user-actions">
+                        <a href="{% url 'jembot:logout' %}" class="logout-btn" title="로그아웃">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <div class = "chat-list__add">
                 <div class = "chat-list__name">대화 목록</div>
-                <div class = "chat-add-button"><button type="button" class="btn btn-outline-secondary">+</button></div>
+                <div class = "chat-add-button">
+                    <button type="button" class="btn btn-outline-secondary" id="new-chat-btn">+</button>
+                </div>
             </div>
-            <div class = "chat-list__item">
-                <div class = "chat-list__empty">저장된 대화가 없습니다.</div>
+            
+            <div class = "chat-list__item" id="chat-sessions-container">
+                <div class = "chat-list__empty" id="empty-sessions">저장된 대화가 없습니다.</div>
             </div>
             
 
@@ -35,26 +59,24 @@
             </div>
         </div>
         <div class = "chat-window">
-            <div class="chat-messages">
+            <div class="chat-messages" id="chat-messages">
                 <div class="chat-start__container">
                     <div class = "chat-start__inside">
-                        <div class = "brand-name">JemBot Message</div>
-                        <div class = "chat-start__time">Today 14:36</div>
                     </div>
                 </div>
                 <div class="chat-bot">
-                    <div class = "chat-bot__content">안녕하세요 무엇을 도와드릴까요?</div>
+                    <div class = "chat-bot__content">안녕하세요 {{ user.get_full_name|default:user.username }}님! 무엇을 도와드릴까요?</div>
                     <div class = "chat-bot__time">14:36</div>
                 </div>
             </div>
             <div class="chat-input__container">
                 <div class = "chat-input">
                     <div class = "chat-input__box">
-                        <input type="text" placeholder="재무 데이터 rag에게 물어보기..." />
+                        <input type="text" placeholder="재무 데이터 rag에게 물어보기..." id="chat-input" />
                     </div>
                     <div class="chat-search">
                         <div class="chat-search-button">
-                            <button type="button" class="btn btn-outline-secondary">
+                            <button type="button" class="btn btn-outline-secondary" id="send-btn">
                                 <i class="bi bi-send"></i>
                             </button>
                         </div>
@@ -74,170 +96,33 @@
             </div>
             <div class="choices-info">
                 <div class = "news-container" id = "news-container">
-                    <div class = "news-box">
-                        <div class = "news-box__top">
-                            <div class = "news-label__mark">
-                                경제
-                            </div>
-                            <div class = "news-label__time">
-                                4분전
-                            </div>
-                        </div>
-                        <div class = "news-title">
-                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
-                        </div>
-                        <div class = "news-content">
-                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
-                        </div>
+                    <!-- 뉴스 데이터가 동적으로 로드됩니다 -->
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-message">뉴스를 불러오는 중...</div>
                     </div>
-                    <div class = "news-box">
-                        <div class = "news-box__top">
-                            <div class = "news-label__mark">
-                                경제
-                            </div>
-                            <div class = "news-label__time">
-                                4분전
-                            </div>
-                        </div>
-                        <div class = "news-title">
-                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
-                        </div>
-                        <div class = "news-content">
-                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
-                        </div>
-                    </div>
-                    <div class = "news-box">
-                        <div class = "news-box__top">
-                            <div class = "news-label__mark">
-                                경제
-                            </div>
-                            <div class = "news-label__time">
-                                4분전
-                            </div>
-                        </div>
-                        <div class = "news-title">
-                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
-                        </div>
-                        <div class = "news-content">
-                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
-                        </div>
-                    </div>
-                    <div class = "news-box">
-                        <div class = "news-box__top">
-                            <div class = "news-label__mark">
-                                경제
-                            </div>
-                            <div class = "news-label__time">
-                                4분전
-                            </div>
-                        </div>
-                        <div class = "news-title">
-                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
-                        </div>
-                        <div class = "news-content">
-                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
-                        </div>
-                    </div>
-                    <div class = "news-box">
-                        <div class = "news-box__top">
-                            <div class = "news-label__mark">
-                                경제
-                            </div>
-                            <div class = "news-label__time">
-                                4분전
-                            </div>
-                        </div>
-                        <div class = "news-title">
-                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
-                        </div>
-                        <div class = "news-content">
-                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
-                        </div>
-                    </div>
-                    <div class = "news-box">
-                        <div class = "news-box__top">
-                            <div class = "news-label__mark">
-                                경제
-                            </div>
-                            <div class = "news-label__time">
-                                4분전
-                            </div>
-                        </div>
-                        <div class = "news-title">
-                            주식 투자로 홀로서기…"ISA 자립청년" 후원사업 출범
-                        </div>
-                        <div class = "news-content">
-                            금융투자협회가 28일 11개 증권사와 함께 "ISA 연계 자립준비청년 후원사업"을 공식 출범한다고 밝혔다. 이 사업은 국내 최초로 ISA(개인종합자산관리계좌)를 활용한 투자형 후원모델을 도입했다. 자립준비청년의 자산 형성과 경제적 자립을 지원하는 사회공헌 프로젝트다.
-                        </div>
-                    </div>
+
                 </div>
                 <div class="stock-container" id = "stock-container">
-                    <div class="stock-box">
-                        <div class="stock-header">
-                            <div class="stock-name">NAVER</div>
-                            <div class="stock-code">035420.KS</div>
-                        </div>
-                        <div class="stock-price-section">
-                            <div class="current-price">₩ 200,000</div>
-                            <div class="price-change positive">+2,500 (+1.25%)</div>
-                            <div class="update-time">14:30 KST</div>
-                        </div>
-                        <div class="stock-chart">
-                            <canvas id="stockChart" width="300" height="100"></canvas>
-                        </div>
-                        <div class="stock-details">
-                            <div class="detail-row">
-                                <div class="detail-item">
-                                    <span class="label">시가총액</span>
-                                    <span class="value">₩ 32조 5,000억</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="label">거래량</span>
-                                    <span class="value">1,234,567주</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-item">
-                                <span class="label">52주 최고</span>
-                                <span class="value">₩ 220,000</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">52주 최저</span>
-                                <span class="value">₩ 150,000</span>
-                            </div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-item">
-                                <span class="label">PER</span>
-                                <span class="value">25.3</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">PBR</span>
-                                <span class="value">3.2</span>
-                            </div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-item">
-                                <span class="label">당일 최고가</span>
-                                <span class="value">25,500원</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">당일 최저가</span>
-                                <span class="value">249,000원</span>
-                            </div>
-                        </div>
+                    <!-- 주식 데이터가 검색 후 동적으로 로드됩니다 -->
+                    <div class="loading-container" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-message">주식 정보를 불러오는 중...</div>
+                    </div>
+                    <div class="stock-placeholder">
+                        <div class="placeholder-message">주식명을 검색해보세요</div>
+                        <div class="placeholder-example">예: 삼성전자, NAVER, LG화학</div>
                     </div>
                 </div>
             </div>
             <div class="choices-input__container">
                 <div class = "choices-input">
                     <div class = "choices-input__box">
-                        <input type="text" placeholder="뉴스 검색" />
+                        <input type="text" placeholder="뉴스 검색" id="search-input" />
                     </div>
                     <div class="choices-search">
                         <div class="choices-search-button">
-                            <button type="button" class="btn btn-outline-secondary">
+                            <button type="button" class="btn btn-outline-secondary" id="search-button">
                                 <i class="bi bi-send"></i>
                             </button>
                         </div>
@@ -247,6 +132,121 @@
 
         </div>
     </div>
+
+    <!-- 사용자 정보 스타일 -->
+    <style>
+    .user-info-section {
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        background: #f8f9fa;
+    }
+    
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .user-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #007bff;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    
+    .user-details {
+        flex: 1;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+    
+    .user-email {
+        color: #666;
+        font-size: 12px;
+    }
+    
+    .user-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .logout-btn {
+        color: #666;
+        text-decoration: none;
+        padding: 4px;
+        border-radius: 4px;
+        transition: color 0.2s;
+    }
+    
+    .logout-btn:hover {
+        color: #dc3545;
+    }
+    
+    .chat-session-item {
+        padding: 10px 15px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        position: relative;
+    }
+    
+    .chat-session-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .chat-session-item.active {
+        background-color: #e3f2fd;
+        border-left: 3px solid #007bff;
+    }
+    
+    .session-title {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+    
+    .session-time {
+        color: #666;
+        font-size: 12px;
+    }
+    
+    .session-delete {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    
+    .chat-session-item:hover .session-delete {
+        opacity: 1;
+    }
+    
+    .session-delete:hover {
+        color: #dc3545;
+    }
+    </style>
     
 {% endblock content %}
 

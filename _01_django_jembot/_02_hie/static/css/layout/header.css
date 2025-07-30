@@ -23,11 +23,6 @@
     font-weight: bold;
 }
 
-.header__nick-name {
-    font-size: 16px;
-    font-weight: bold;
-}
-
 .header__actions {
     display: flex;
     align-items: center;

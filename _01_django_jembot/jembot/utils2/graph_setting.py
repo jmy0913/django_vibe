@@ -27,6 +27,7 @@ def graph_setting():
     graph.add_node("simple", elief)
 
 
+
     # 흐름 정의
     graph.set_entry_point("classify")
 

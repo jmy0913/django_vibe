@@ -1,4 +1,3 @@
-server
 :root {
     --input-background-color: rgb(237, 237, 237);
     --chat-bot__content-color: rgb(240, 240, 240);
@@ -124,12 +123,10 @@ server
 }
 
 .btn-group .btn-check:checked + .btn {
-    background-color: #007bff !important;
-    border-color: #007bff !important;
-    color: white !important;
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transform: translateY(-1px);
+    background-color: var(--level-button-color);
+    border-color: var(--level-button-color);
+    color: var(--action-btn-font-color);
+    font-weight: 500 ;
 }
 
 /* ㅡㅡㅡㅡ 챗봇 css ㅡㅡㅡㅡ */
@@ -207,7 +204,6 @@ server
     max-width: 80%; 
     word-wrap: break-word; 
     color : white;
-    font-weight: 500;
 }
 
 
@@ -222,64 +218,9 @@ server
     position: absolute;
     top: 10px;
     left: 20px; 
-    background-color: #ff9500;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 600;
+    background-color: #f1a438;
 }
 
-.advanced_answer__mark {
-    background-color: #e74c3c;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-/* 로딩 애니메이션 */
-.loading-dots {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-}
-
-.loading-dots span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #999;
-    animation: loading-dots 1.4s infinite ease-in-out;
-}
-
-.loading-dots span:nth-child(1) {
-    animation-delay: -0.32s;
-}
-
-.loading-dots span:nth-child(2) {
-    animation-delay: -0.16s;
-}
-
-@keyframes loading-dots {
-    0%, 80%, 100% {
-        transform: scale(0);
-        opacity: 0.5;
-    }
-    40% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.loading-message .chat-bot__content {
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .chat-input__container,
 .choices-input__container,
@@ -361,6 +302,15 @@ server
     color: var(--action-btn-font-color);
 }
 
+/* active 상태 스타일 */
+.chat-add-button .btn.active,
+.news-button .btn.active,
+.stock-button .btn.active {
+    background-color: var(--action-btn-color) !important;
+    border-color: var(--action-btn-color) !important;
+    color: var(--action-btn-font-color) !important;
+}
+
 .chat-add-button .btn.active,
 .news-button .btn.active,
 .stock-button .btn.active {
@@ -439,12 +389,13 @@ server
     align-items: flex-start;
     gap: 32px;
     display:none;
+    height : 100%;
 }
   
 .stock-box {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 10px;
     min-width: 100px;
 }
   
@@ -456,8 +407,12 @@ server
   
 .stock-name {
     font-size: 1.3rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #222;
+}
+
+.stock-name--long {
+    font-size: 1.05rem; /* 긴 이름일 경우 폰트 크기 축소 */
 }
   
 .stock-code {
@@ -474,7 +429,7 @@ server
   
 .current-price {
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #222;
 }
   
@@ -490,9 +445,33 @@ server
     font-size: 0.9rem;
     color: #b0b8c1;
 }
+
+.stock-period-selector {
+    display: flex;
+    gap: 8px;
+}
+.period-button {
+    background-color: #f3f6fa;
+    border: none;
+    border-radius: 15px;
+    padding: 4px 15px; /* 기존 6px 12px에서 축소 */
+    font-size: 0.8rem; /* 기존 0.9rem에서 축소 */
+    font-weight: 500;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.period-button:hover {
+    background-color: #e9eef5;
+}
+.period-button.active {
+    background-color: var(--action-btn-color);
+    color: var(--action-btn-font-color);
+    font-weight: 600;
+}
   
 .stock-chart {
-    margin: 12px 0 18px 0;
+    margin: 10px 0;
     background: #f3f6fa;
     border-radius: 12px;
     padding: 12px 8px;
@@ -518,185 +497,42 @@ server
 }
   
 .label {
-    font-size: 0.95rem;
+    font-size: 0.85rem; /* 기존 0.95rem에서 축소 */
     color: #b0b8c1;
     font-weight: 500;
 }
   
 .value {
-    font-size: 1.08rem;
+    font-size: 1rem; /* 기존 1.08rem에서 축소 */
     color: #222;
-    font-weight: 600;
-}
-
-/* 뉴스 링크 스타일 */
-.news-link {
-    display: inline-block;
-    margin-top: 8px;
-    color: #007bff;
-    text-decoration: none;
-    font-size: 12px;
-    padding: 4px 8px;
-    border: 1px solid #007bff;
-    border-radius: 4px;
-    transition: all 0.2s;
-}
-
-.news-link:hover {
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-}
-
-/* 주식 가격 변화 스타일 */
-.price-change.positive {
-    color: #dc3545; /* 빨간색 - 상승 */
-}
-
-.price-change.negative {
-    color: #007bff; /* 파란색 - 하락 */
-}
-
-/* 로딩 컨테이너 */
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    text-align: center;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #007bff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 16px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading-message {
-    color: #666;
-    font-size: 14px;
-}
-
-/* 에러 컨테이너 */
-.error-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    text-align: center;
-}
-
-.error-message {
-    color: #dc3545;
-    font-size: 14px;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-    padding: 12px 16px;
-    white-space: pre-line;
-}
-
-/* 주식 차트 컨테이너 */
-.stock-chart {
-    margin: 16px 0;
-    padding: 12px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-}
-
-/* 주식 정보 세부사항 */
-.stock-details .detail-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-
-.stock-details .detail-item {
-    display: flex;
-    flex-direction: column;
-    width: 48%;
-}
-
-.stock-details .detail-item .label {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 2px;
-}
-
-.stock-details .detail-item .value {
-    font-size: 14px;
     font-weight: 500;
-    color: #333;
 }
 
-/* 검색 입력 필드 개선 */
-.choices-input__box input {
-    transition: border-color 0.2s;
-}
-
-.choices-input__box input:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-/* 버튼 활성화 스타일 개선 */
-#news-button.active,
-#stock-button.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-/* 주식 플레이스홀더 */
-.stock-placeholder {
+.stock-placeholder,
+.news-placeholder {
+    text-align: center;
+    color: #aaa;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    padding: 60px 20px;
-    text-align: center;
-    color: #666;
+    align-items: center;
+    height: 100%;
+    width: 100%;
 }
 
-.placeholder-message {
-    font-size: 16px;
-    margin-bottom: 8px;
-    color: #333;
+.stock-placeholder i,
+.news-placeholder i {
+    font-size: 40px;
+    margin-bottom: 15px;
 }
 
-.placeholder-example {
-    font-size: 14px;
-    color: #999;
+
+
+.news-box a {
+    color: inherit;
+    text-decoration: none;
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-    .stock-details .detail-row {
-        flex-direction: column;
-    }
-    
-    .stock-details .detail-item {
-        width: 100%;
-        margin-bottom: 8px;
-    }
-    
-    .loading-container,
-    .error-container {
-        padding: 20px 10px;
-    }
-    
-    .stock-placeholder {
-        padding: 40px 15px;
-    }
+.news-box a:hover {
+    text-decoration: underline;
 }

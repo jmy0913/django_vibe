@@ -1,24 +1,19 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
 import json
-import uuid
-from datetime import datetime, timedelta, timezone
 from urllib.parse import quote
 import requests
+import os
 from bs4 import BeautifulSoup
 import yfinance as yf
 from pykrx import stock
 import pandas as pd
+from datetime import datetime, timedelta, timezone
 import numpy as np
 
-from .models import Custom_user, Nickname, ChatSession, ChatMessage
-from .utils2.main import run_langraph
-
-# 별칭(Alias) 맵
+# --- 별칭(Alias) 맵 ---
+# 자주 사용되는 한글/약칭을 공식 명칭으로 변환합니다.
 STOCK_ALIASES = {
     "네이버": "NAVER",
     "엘지": "LG",
@@ -29,6 +24,13 @@ STOCK_ALIASES = {
     "sk하이닉스": "SK하이닉스",
     "엘지에너지솔루션": "LG에너지솔루션",
 }
+
+# --- 네이버 API 키 설정 ---
+NAVER_CLIENT_ID = "_UjwRjk7ehd5FauRIy01" 
+NAVER_CLIENT_SECRET = "CZlqMZvTnM"
+
+def chatbot(request):
+    return render(request, 'app/main.html')
 
 def clean_html(html_string):
     """HTML 태그를 제거하고 텍스트만 반환합니다."""
@@ -58,10 +60,10 @@ def time_ago(pub_date: str) -> str:
         date_obj = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %z')
         now = datetime.now(timezone.utc)
         diff = now - date_obj
-        
+
         seconds = diff.total_seconds()
         days = diff.days
-        
+
         if days >= 30:
             return f"{days // 30}달 전"
         if days >= 7:
@@ -74,13 +76,16 @@ def time_ago(pub_date: str) -> str:
             return f"{int(seconds // 60)}분 전"
         return "방금 전"
     except (ValueError, TypeError):
-        return pub_date
+        return pub_date # 파싱 실패 시 원본 반환
+
 
 def format_market_cap(cap):
     """시가총액을 '조'와 '억' 단위로 변환합니다."""
+    # 1. Series 등 숫자가 아닌 값이 들어오는 경우를 먼저 안전하게 처리
     if not isinstance(cap, (int, float, np.number)):
         return "N/A"
     
+    # 2. 이제 cap은 숫자 타입임이 보장되므로, 값을 비교
     if cap is None or cap == 0:
         return "N/A"
     
@@ -97,149 +102,7 @@ def format_market_cap(cap):
     else:
         return f"{int(cap // 1_0000)}만"
 
-# Create your views here.
-
-@login_required
-def index(request):
-    """메인 페이지 - 로그인 필요"""
-    try:
-        nickname = request.user.nickname.nickname if hasattr(request.user, 'nickname') else request.user.username
-    except:
-        nickname = request.user.username
-    
-    return render(request, "app/main.html", {"nickname": nickname, "user": request.user})
-
-@require_http_methods(["POST"])
-@login_required
-def chat_api(request):
-    """RAG 챗봇 API 엔드포인트 - 로그인 필요"""
-    try:
-        data = json.loads(request.body)
-        user_message = data.get('message', '')
-        level = data.get('level', 'basic')  # basic, intermediate, advanced
-        session_id = data.get('session_id', '')  # 세션 ID 받기
-        chat_history = data.get('chat_history', [])  # 대화 기록 받기
-        
-        # 디버깅용 로그
-        print(f"받은 데이터: message='{user_message}', level='{level}', session_id='{session_id}'")
-        print(f"대화 기록 길이: {len(chat_history)}")
-        
-        if not user_message:
-            return JsonResponse({'error': '메시지가 없습니다.'}, status=400)
-        
-        # 세션 ID가 없으면 새로 생성
-        if not session_id:
-            session_id = str(uuid.uuid4())
-            # 새 세션 생성
-            chat_session = ChatSession.objects.create(
-                user=request.user,
-                session_id=session_id,
-                title=user_message[:50] + "..." if len(user_message) > 50 else user_message
-            )
-        else:
-            # 기존 세션 가져오기
-            try:
-                chat_session = ChatSession.objects.get(session_id=session_id, user=request.user)
-            except ChatSession.DoesNotExist:
-                return JsonResponse({'error': '세션을 찾을 수 없습니다.'}, status=404)
-        
-        # 사용자 메시지 저장
-        ChatMessage.objects.create(
-            session=chat_session,
-            message_type='user',
-            content=user_message
-        )
-        
-        # DB에서 채팅 히스토리 가져오기 (최근 20개 메시지만)
-        db_chat_history = []
-        messages = ChatMessage.objects.filter(session=chat_session).order_by('-timestamp')[:20]
-        # 시간순으로 다시 정렬 (오래된 것부터)
-        messages = reversed(messages)
-        
-        for msg in messages:
-            if msg.message_type == 'user':
-                db_chat_history.append({"role": "user", "content": msg.content})
-            else:
-                db_chat_history.append({"role": "assistant", "content": msg.content})
-        
-        # RAG 챗봇 실행 (세션 ID, 레벨, 대화 히스토리 전달)
-        print(f"RAG 챗봇 호출: level='{level}', session_id='{session_id}', history_length={len(db_chat_history)}")
-        response = run_langraph(user_message, session_id, level, db_chat_history)
-        
-        # 응답에서 실제 답변 추출
-        if isinstance(response, dict):
-            bot_message = response.get('answer', '죄송합니다. 응답을 생성할 수 없습니다.')
-        else:
-            bot_message = str(response)
-        
-        # 봇 메시지 저장
-        ChatMessage.objects.create(
-            session=chat_session,
-            message_type='bot',
-            content=bot_message
-        )
-        
-        # 세션 업데이트 시간 갱신
-        chat_session.save()
-        
-        # 현재 시간
-        current_time = datetime.now().strftime("%H:%M")
-        
-        return JsonResponse({
-            'success': True,
-            'bot_message': bot_message,
-            'timestamp': current_time,
-            'level': level,
-            'session_id': session_id  # 세션 ID 반환
-        })
-        
-    except Exception as e:
-        return JsonResponse({
-            'error': f'서버 오류가 발생했습니다: {str(e)}'
-        }, status=500)
-
-@login_required
-def get_chat_history(request, session_id):
-    """특정 세션의 채팅 히스토리 가져오기"""
-    try:
-        chat_session = ChatSession.objects.get(session_id=session_id, user=request.user)
-        messages = ChatMessage.objects.filter(session=chat_session).order_by('timestamp')
-        
-        history = []
-        for msg in messages:
-            history.append({
-                'type': msg.message_type,
-                'content': msg.content,
-                'timestamp': msg.timestamp.strftime('%H:%M')
-            })
-        
-        return JsonResponse({
-            'success': True,
-            'session_title': chat_session.title,
-            'history': history
-        })
-        
-    except ChatSession.DoesNotExist:
-        return JsonResponse({'error': '세션을 찾을 수 없습니다.'}, status=404)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
-@login_required
-def delete_session(request, session_id):
-    """채팅 세션 삭제"""
-    try:
-        chat_session = ChatSession.objects.get(session_id=session_id, user=request.user)
-        chat_session.is_active = False
-        chat_session.save()
-        
-        return JsonResponse({'success': True})
-        
-    except ChatSession.DoesNotExist:
-        return JsonResponse({'error': '세션을 찾을 수 없습니다.'}, status=404)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
-@login_required
+@csrf_exempt
 def get_stock_info(request):
     """
     회사명을 받아 주식 정보를 조회하고 JSON으로 반환하는 API 뷰.
@@ -249,12 +112,12 @@ def get_stock_info(request):
         try:
             data = json.loads(request.body)
             company_name = data.get('query', '').strip()
-            period = data.get('period', '1m') # 기본값 1개월
+            period = data.get('period', '1m') # 기본값 1개월로 변경
 
             if not company_name:
                 return JsonResponse({'success': False, 'error': '기업명을 입력해주세요.'})
 
-            # KRX 티커 정보 로드 및 캐싱
+            # KRX 티커 정보 로드 및 캐싱 개선 (휴일/주말에도 안전하게)
             if 'krx_tickers' not in get_stock_info.__dict__:
                 latest_day_for_map = stock.get_nearest_business_day_in_a_week()
                 kospi = stock.get_market_ticker_list(date=latest_day_for_map, market="KOSPI")
@@ -266,12 +129,13 @@ def get_stock_info(request):
 
             name_to_code = get_stock_info.krx_tickers
             
-            # 스마트 검색 로직
+            # --- 스마트 검색 로직 ---
+            # 1. 별칭(alias) 및 대소문자 처리
             search_term = company_name.lower().replace(" ", "")
             if search_term in STOCK_ALIASES:
                 company_name = STOCK_ALIASES[search_term]
 
-            # 정확한 이름으로 코드 찾기
+            # 2. 정확한 이름으로 코드 찾기 (대소문자 무시)
             found_code = None
             found_name = None
             for name, code in name_to_code.items():
@@ -281,10 +145,10 @@ def get_stock_info(request):
                     break
             
             if not found_code:
-                # 일치하는 항목이 없으면, 제안 찾기 (부분 일치)
+                # 3. 일치하는 항목이 없으면, 제안 찾기 (부분 일치)
                 similar_names = [name for name in name_to_code.keys() if company_name in name]
                 if similar_names:
-                    error_message = f"정확한 기업명을 입력해주세요.\n혹시 이거 찾으세요?: {', '.join(similar_names[:3])}"
+                    error_message = f"정확한 기업명을 입력해주세요. \n                     혹시 이거 찾으세요?: {', '.join(similar_names[:3])}"
                 else:
                     error_message = "해당 기업명은 상장기업이 아닙니다."
                 return JsonResponse({"success": False, "error": error_message})
@@ -299,17 +163,19 @@ def get_stock_info(request):
             is_kospi = code in kospi_tickers
             yahoo_code = f"{code}.KS" if is_kospi else f"{code}.KQ"
             
-            # yfinance 상세 정보 조회
+            # --- yfinance 상세 정보 조회 (안정성 강화) ---
             info = {}
             try:
                 ticker = yf.Ticker(yahoo_code)
                 info = ticker.info
             except Exception as e:
-                print(f"yfinance ticker.info 조회 중 오류 발생: {e}")
+                print(f"!!! yfinance ticker.info 조회 중 오류 발생: {e}")
+                print("!!! 상세 정보를 제외하고 차트 데이터만으로 응답을 구성합니다.")
 
-            # 기본 정보 계산용 데이터 (항상 1년치)
+            # --- 기본 정보 계산용 데이터 (항상 1년치) ---
             today = datetime.today()
             one_year_ago = today - timedelta(days=365)
+            # yfinance는 종종 마지막 날 데이터를 누락하므로 하루를 더해줌
             history_df = yf.download(yahoo_code, start=one_year_ago, end=today + timedelta(days=1), progress=False, auto_adjust=True)
 
             if history_df.empty:
@@ -329,26 +195,28 @@ def get_stock_info(request):
             price_change = latest_close - previous_close
             change_percent = (price_change / previous_close) * 100 if previous_close != 0 else 0
 
-            # 차트용 데이터
+            # --- 차트용 데이터 (기간에 맞게 조회) ---
             if period == '1d':
                 chart_df = yf.download(yahoo_code, period="1d", interval="15m", progress=False, auto_adjust=True)
                 chart_df.index = chart_df.index.strftime('%H:%M')
             else:
-                period_map = {'1w': 7, '1m': 30, '1y': 365}
-                start_date = today - timedelta(days=period_map.get(period, 30))
+                period_map = {'1w': 7, '1m': 30, '1y': 365} # 3m 제거
+                start_date = today - timedelta(days=period_map.get(period, 30)) # 기본값 30일로 변경
+                # history_df에서 해당 기간만큼 잘라내서 사용
                 chart_df = history_df[history_df.index >= pd.to_datetime(start_date)]
                 chart_df.index = chart_df.index.strftime('%m-%d')
             
             chart_df = chart_df.reset_index()
             chart_close_series = chart_df['Close'].iloc[:, 0] if isinstance(chart_df['Close'], pd.DataFrame) else chart_df['Close']
             
-            # 데이터 값 안전하게 가져오기
+            # --- 데이터 값 안전하게 가져오기 (휴일/주말 고려) ---
+            # info.get()의 값이 0인 경우도 비정상으로 간주하고, 마지막 거래일의 데이터로 대체합니다.
             latest_price_val = info.get('currentPrice') if info.get('currentPrice') not in [None, 0] else latest_close
             volume_val = info.get('volume') if info.get('volume') not in [None, 0] else full_volume_series.iloc[-1]
             day_high_val = info.get('dayHigh') if info.get('dayHigh') not in [None, 0] else full_high_series.iloc[-1]
             day_low_val = info.get('dayLow') if info.get('dayLow') not in [None, 0] else full_low_series.iloc[-1]
             
-            # PER/PBR 또는 대체 정보 구성
+            # --- PER/PBR 또는 대체 정보 구성 (Fallback 로직 강화) ---
             per_label, per_value = "PER", info.get('trailingPE')
             if per_value is None:
                 per_label, per_value = "Forward P/E", info.get('forwardPE')
@@ -366,7 +234,7 @@ def get_stock_info(request):
                 'success': True,
                 'companyName': info.get('shortName', company_name),
                 'code': yahoo_code,
-                'period': period,
+                'period': period, # 현재 조회된 기간을 응답에 포함
                 'latestPrice': f"{latest_price_val:,.0f}",
                 'priceChange': f"{price_change:+,.0f}",
                 'changePercent': f"{change_percent:+.2f}",
@@ -397,23 +265,22 @@ def get_stock_info(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
-@login_required
+@csrf_exempt
 def crawl_naver_news(request):
-    """네이버 뉴스 API를 사용해서 뉴스 검색"""
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             search_query = data.get('query', '')
 
-            if not settings.NAVER_CLIENT_ID or settings.NAVER_CLIENT_ID == "YOUR_CLIENT_ID":
+            if not NAVER_CLIENT_ID or NAVER_CLIENT_ID == "YOUR_CLIENT_ID":
                 raise ValueError("네이버 API Client ID가 설정되지 않았습니다.")
-            if not settings.NAVER_CLIENT_SECRET or settings.NAVER_CLIENT_SECRET == "YOUR_CLIENT_SECRET":
+            if not NAVER_CLIENT_SECRET or NAVER_CLIENT_SECRET == "YOUR_CLIENT_SECRET":
                 raise ValueError("네이버 API Client Secret이 설정되지 않았습니다.")
 
             url = 'https://openapi.naver.com/v1/search/news.json'
             headers = {
-                "X-Naver-Client-Id": settings.NAVER_CLIENT_ID,
-                "X-Naver-Client-Secret": settings.NAVER_CLIENT_SECRET
+                "X-Naver-Client-Id": NAVER_CLIENT_ID,
+                "X-Naver-Client-Secret": NAVER_CLIENT_SECRET
             }
             params = {
                 'query': search_query,
@@ -473,7 +340,7 @@ def crawl_naver_news(request):
             error_data = e.response.json() if e.response else {}
             return JsonResponse({'success': False, 'error': f"API 호출에 실패했습니다: {error_data.get('errorMessage', str(e))}"})
         except Exception as e:
-            print(f"알 수 없는 오류 발생: {str(e)}")
+            print(f"\n알 수 없는 오류 발생: {str(e)}")
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})

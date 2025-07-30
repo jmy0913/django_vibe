@@ -1,0 +1,174 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "css/app/main.css" %}">
+{% endblock head %}
+
+{% block title %}chatbot{% endblock title %}
+
+{% block content %}
+    <div class = "chat-container">
+        <div class = "chat-list">
+            <div class = "chat-list__add">
+                <div class = "chat-list__name">대화 목록</div>
+                <div class = "chat-add-button"><button type="button" class="btn btn-outline-secondary">+</button></div>
+            </div>
+            <div class = "chat-list__item">
+                {% comment %} <div class = "chat-list__empty">저장된 대화가 없습니다.</div> {% endcomment %}
+                <div class = "chat-list__box">
+                    <div class = "chat-list__text">
+                        <div class = "chat-list__title">2024년 삼성전자 재무제표</div>
+                        <div class = "chat-list__time">2025/07/29 1:13am</div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu">
+                            <li><button class="dropdown-item" type="button">Share</button></li>
+                            <li><button class="dropdown-item" type="button">Rename</button></li>
+                            <li><button class="dropdown-item" type="button">Delete</button></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class = "chat-list__box">
+                    <div class = "chat-list__text">
+                        <div class = "chat-list__title">카카오 투자</div>
+                        <div class = "chat-list__time">2025/07/28 18:13pm</div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu">
+                            <li><button class="dropdown-item" type="button">Share</button></li>
+                            <li><button class="dropdown-item" type="button">Rename</button></li>
+                            <li><button class="dropdown-item" type="button">Delete</button></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class = "chat-list__box">
+                    <div class = "chat-list__text">
+                        <div class = "chat-list__title">네이버 현재 상황</div>
+                        <div class = "chat-list__time">2025/07/28 12:13Pm</div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu">
+                            <li><button class="dropdown-item" type="button">Share</button></li>
+                            <li><button class="dropdown-item" type="button">Rename</button></li>
+                            <li><button class="dropdown-item" type="button">Delete</button></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+            
+
+            <div class = 'btn-group__container'>
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="btnradio1">초급</label>
+                  
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio2">중급</label>
+                  
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio3">고급</label>
+                </div>
+            </div>
+        </div>
+        <div class = "chat-window">
+            <div class="chat-messages">
+                <div class="chat-start__container">
+                    <div class = "chat-start__inside">
+                        <div class = "brand-name">JemBot Message</div>
+                        <div class = "chat-start__time">Today 14:36</div>
+                    </div>
+                </div>
+                <div class="chat-bot">
+                    <div class = "chat-bot__content">안녕하세요 무엇을 도와드릴까요?</div>
+                    <div class = "chat-bot__time">14:36</div>
+                </div>
+                <div class="chat-user">
+                    <div class = "chat-user__time">14:38</div>
+                    <div class = "chat-user__content">안녕하세요. 2024년 삼성전자의 재무제표에 대해 알고싶어요.</div>
+                </div>
+
+                <div class="chat-bot" id = "beginner_answer">
+                    <div class = "beginner_answer__mark">초급</div>
+                    <div class = "chat-bot__content">삼성전자의 2024년 연결 재무제표(연간) 요약입니다:
+                        매출: 약 300.9조 원 (전년 대비 +16.2%)
+                        영업이익: 약 32.7조 원 (전년 대비 약 5배 증가)
+                        순이익: 약 34.5조 원
+                        총자산: 약 514조 원
+                        부채총계: 약 112조 원
+                        자본총계: 약 402조 원
+                        👉 출처: 삼성전자 IR, 2024년 연결 감사보고서
+                        필요하시면 분기별 실적도 알려드릴게요.
+                    </div>
+                    <div class = "chat-bot__time">14:39</div>
+                </div>
+                <div class="chat-user">
+                    <div class = "chat-user__time">14:42</div>
+                    <div class = "chat-user__content">그럼 네이버에 대해서도 알려주실수 있으실까요? 같은 년도로 부탁드려요.</div>
+                </div>
+
+                <div class="chat-bot" id = "intermediate_answer">
+                    <div class = "intermediate_answer__mark">중급</div>
+                    <div class = "chat-bot__content">2024년 네이버의 연결 기준 재무제표를 살펴보면, 연간 매출은 약 10조 7,380억 원으로 전년 대비 약 11% 증가했습니다. 영업이익은 약 1조 9,790억 원으로, 전년보다 약 33% 늘어났고, 영업이익률은 약 18.4%로 개선된 모습입니다.
+                        법인세 차감 전 순이익은 약 2조 3,220억 원 수준이며, 당기순이익(세후 기준)은 약 1조 6천억 원에서 1조 7천억 원 사이로 추정됩니다.
+                        재무상태를 보면, 총자산은 약 38조 1,700억 원, 총부채는 약 11조 1,700억 원이며, 자본총계는 약 27조 원 정도입니다. 부채비율은 약 41%에서 43% 사이로, 안정적인 재무구조를 유지하고 있습니다.
+                    </div>
+                    <div class = "chat-bot__time">14:42</div>
+                </div>
+                
+            </div>
+            <div class="chat-input__container">
+                <div class = "chat-input">
+                    <div class = "chat-input__box">
+                        <input type="text" placeholder="재무 데이터 rag에게 물어보기..." />
+                    </div>
+                    <div class="chat-search">
+                        <div class="chat-search-button">
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class = "additional_info">
+            <div class="choices">
+                <div class="stock">
+                    <div class="stock-button"><button id="stock-button" type="button" class="btn btn-outline-secondary">주식</button></div>
+                </div>
+                <div class="news">
+                    <div class="news-button"><button id="news-button" type="button" class="btn btn-outline-secondary">뉴스</button></div>
+                </div>
+            </div>
+            <div class="choices-info">
+                <div class="news-container" id="news-container">
+                </div>
+                <div class="stock-container" id="stock-container">
+                </div>
+            </div>
+            <div class="choices-input__container">
+                <div class = "choices-input">
+                    <div class = "choices-input__box">
+                        <input type="text" placeholder="주식 검색" />
+                    </div>
+                    <div class="choices-search">
+                        <div class="choices-search-button">
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+{% endblock content %}
+
