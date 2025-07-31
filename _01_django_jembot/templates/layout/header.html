@@ -8,7 +8,7 @@
         <img src="{% static 'images/robot-icon.png' %}" alt="Robot Icon" class="header__logo-image" />
         <div class="header__logo-name">JemBot</div>
 		{#span id="nickname" 새로 생성#}
-	    <span id="nickname" class="header__nick-name"> | (유저: {{ nickname.nickname }})</span>
+	    <span id="nickname" class="header__nick-name"> | (유저: {{ user.nickname.nickname | default_if_none:'익명' }})</span>
     </div>
     <div class="header__actions">
         <div class="header__help">?</div>

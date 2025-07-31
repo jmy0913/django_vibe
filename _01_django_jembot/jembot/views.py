@@ -109,6 +109,17 @@ def index(request):
     
     return render(request, "app/main.html", {"nickname": nickname, "user": request.user})
 
+# User 객체를 직렬화할 때 필요한 필드만 딕셔너리 형태로 변환
+def user_to_dict(user):
+    return {
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'profile_picture': user.profile_picture,
+        'signup_at': user.signup_at.strftime('%Y-%m-%d %H:%M:%S')  # 날짜 형식 지정
+    }
+
+
 @require_http_methods(["POST"])
 @login_required
 def chat_api(request):
@@ -190,13 +201,16 @@ def chat_api(request):
             'bot_message': bot_message,
             'timestamp': current_time,
             'level': level,
-            'session_id': session_id  # 세션 ID 반환
+            'session_id': session_id,  # 세션 ID 반환,
+            'user': user_to_dict(request.user)
         })
         
     except Exception as e:
         return JsonResponse({
             'error': f'서버 오류가 발생했습니다: {str(e)}'
         }, status=500)
+
+
 
 @login_required
 def get_chat_history(request, session_id):

@@ -21,6 +21,10 @@ import os
 # Load environment variables
 load_dotenv()
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+faiss_path1 = os.path.join(current_dir, "faiss_index3")
+faiss_path2 = os.path.join(current_dir, "faiss_index_bge_m3")
+print(faiss_path1, faiss_path2)
 
 def faiss_retriever_loading():
     current_dir = os.path.dirname(os.path.abspath(__file__))
